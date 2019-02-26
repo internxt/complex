@@ -41,9 +41,9 @@
     "request": "^2.75.0",
     "restify": "^4.1.1",
     "secp256k1": "^3.2.2",
-    "storj-lib": "^8.7.1",
-    "storj-mongodb-adapter": "^9.0.0",
-    "storj-service-storage-models": "^10.2.2",
+    "storj-lib": "internxt/core",
+    "storj-mongodb-adapter": "internxt/mongodb-adapter",
+    "storj-service-storage-models": "internxt/service-storage-models",
     "uuid": "^3.0.0"
   },
   "devDependencies": {
