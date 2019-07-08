@@ -11,7 +11,7 @@ var LandlordConfig = require('../lib/config').LandlordConfig;
 
 var seed = 'a0c42a9c3ac6abf2ba6a9946ae83af18f51bf1c9fa7dacc4c92513cc4dd015834' +
     '341c775dcd4c0fac73547c5662d81a9e9361a0aac604a73a321bd9103bce8af';
-var masterKey = HDKey.fromMasterSeed(new Buffer(seed, 'hex'));
+var masterKey = HDKey.fromMasterSeed(Buffer.from(seed, 'hex'));
 var xpriv = 'xprv9xJ62Jwpr14Bbz63pamJV4Z3qT67JfqddRW55LR2bUQ38jty7G2TSVkE5Ro8' +
     'yYZjrJGVhN8Z3qvmM9XWgGvyceNMUj7xozR4LZS1eEFP5W3';
 var hdKey = masterKey.derive('m/3000\'/0\'');
@@ -87,7 +87,7 @@ describe('Base Config', function() {
     var readFileSync = sandbox.stub(fs, 'readFileSync');
     readFileSync.onFirstCall().returns(JSON.stringify(config));
     readFileSync.onSecondCall().returns(xpriv);
-    readFileSync.onThirdCall().returns(new Buffer('key'));
+    readFileSync.onThirdCall().returns(Buffer.from('key'));
     var conf = complex.createConfig('/tmp/somepath.json');
     expect(conf[0]).to.be.instanceOf(LandlordConfig);
     expect(conf[1]).to.be.instanceOf(RenterConfig);
@@ -176,7 +176,7 @@ describe('Renter Config', function() {
     var readFileSync = sandbox.stub(fs, 'readFileSync');
     readFileSync.onFirstCall().returns(JSON.stringify(config));
     readFileSync.onSecondCall().returns(xpriv);
-    readFileSync.onThirdCall().returns(new Buffer('key'));
+    readFileSync.onThirdCall().returns(Buffer.from('key'));
     var conf = complex.createConfig('/tmp/somepath.json');
     expect(conf._.migrationPrivateKey).to.equal('key');
     expect(conf._.networkPrivateExtendedKey).to.equal(xpriv);
