@@ -13,14 +13,14 @@ var fs = require('fs');
 var complex = require('..');
 var Landlord = require('../lib/landlord');
 
-describe('Landlord', function() {
+describe('Landlord', function () {
   var sandbox = sinon.sandbox.create();
-  afterEach(function() {
+  afterEach(function () {
     sandbox.restore();
   });
 
-  describe('@construction', function() {
-    var opts = {hello: 'world'};
+  describe('@construction', function () {
+    var opts = { hello: 'world' };
     function checkLandlord(landlord) {
       expect(landlord);
       expect(landlord._opts.hello).to.equal('world');
@@ -31,33 +31,33 @@ describe('Landlord', function() {
       expect(Landlord.prototype._bindServerRoutes.callCount).to.equal(1);
     }
 
-    it('will create without new', function() {
+    it('will create without new', function () {
       sandbox.stub(Landlord.prototype, '_bindServerRoutes');
       var landlord = complex.createLandlord(opts);
       checkLandlord(landlord);
     });
 
-    it('will create with new', function() {
+    it('will create with new', function () {
       sandbox.stub(Landlord.prototype, '_bindServerRoutes');
       var landlord = new complex.createLandlord(opts);
       checkLandlord(landlord);
     });
 
-    it('will push on logger data events', function(done) {
+    it('will push on logger data events', function (done) {
       var landlord = complex.createLandlord({});
-      landlord.once('data', function(data) {
+      landlord.once('data', function (data) {
         expect(data.toString()).to.equal('hello');
         done();
       });
       landlord._logger.emit('data', 'hello');
     });
 
-    it('will set the default request timeout', function() {
+    it('will set the default request timeout', function () {
       var landlord = complex.createLandlord({});
       expect(landlord._requestTimeout).to.equal(90000);
     });
 
-    it('will convert config instance to object', function() {
+    it('will convert config instance to object', function () {
       var config = {
         type: 'Landlord',
         opts: {
@@ -86,8 +86,8 @@ describe('Landlord', function() {
 
   });
 
-  describe('#_initStorage', function() {
-    it('will instantiate storage', function() {
+  describe('#_initStorage', function () {
+    it('will instantiate storage', function () {
       var options = {
         mongoUrl: 'mongodb://localhost:37017/storj-test',
         mongoOpts: {
@@ -111,9 +111,9 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_bindServerRoutes', function() {
+  describe('#_bindServerRoutes', function () {
 
-    it('will use auth and body parser', function() {
+    it('will use auth and body parser', function () {
       var landlord = complex.createLandlord({});
       landlord.server = {
         use: sandbox.stub(),
@@ -132,9 +132,9 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#start', function() {
+  describe('#start', function () {
 
-    it('will start server and rabbit context', function(done) {
+    it('will start server and rabbit context', function (done) {
       var landlord = complex.createLandlord({
         serverPort: 3425
       });
@@ -143,11 +143,11 @@ describe('Landlord', function() {
       };
       var rabbit = new EventEmitter();
       sandbox.stub(rabbitmq, 'createContext').returns(rabbit);
-      sandbox.stub(landlord, '_initMessageBus', function() {
+      sandbox.stub(landlord, '_initMessageBus', function () {
         this.emit('ready');
       });
       sandbox.stub(landlord, '_initStorage');
-      landlord.start(function(err) {
+      landlord.start(function (err) {
         expect(landlord._initMessageBus.callCount).to.equal(1);
         expect(landlord._initStorage.callCount).to.equal(1);
         expect(landlord.server.listen.callCount).to.equal(1);
@@ -158,7 +158,7 @@ describe('Landlord', function() {
       rabbit.emit('ready');
     });
 
-    it('will handle error', function(done) {
+    it('will handle error', function (done) {
       var landlord = complex.createLandlord({});
       landlord.server = {
         listen: sandbox.stub()
@@ -166,10 +166,10 @@ describe('Landlord', function() {
       var rabbit = new EventEmitter();
       sandbox.stub(rabbitmq, 'createContext').returns(rabbit);
       sandbox.stub(landlord, '_initStorage');
-      sandbox.stub(landlord, '_initMessageBus', function() {
+      sandbox.stub(landlord, '_initMessageBus', function () {
         this.emit('error', new Error('test'));
       });
-      landlord.start(function(err) {
+      landlord.start(function (err) {
         expect(err).to.be.instanceOf(Error);
         done();
       });
@@ -177,15 +177,15 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_initMessageBus', function() {
+  describe('#_initMessageBus', function () {
 
-    it('will init amqp sockets', function(done) {
+    it('will init amqp sockets', function (done) {
       var landlord = complex.createLandlord({});
       var subscriber = new EventEmitter();
       subscriber.connect = sandbox.stub();
       landlord._amqpContext = {
-        socket: function(type) {
-          switch(type) {
+        socket: function (type) {
+          switch (type) {
             case 'PUBLISH':
               return {
                 connect: sandbox.stub()
@@ -199,11 +199,11 @@ describe('Landlord', function() {
           }
         }
       };
-      landlord._handleWorkResult = function(data) {
+      landlord._handleWorkResult = function (data) {
         expect(data).to.equal('z');
         done();
       };
-      landlord.on('ready', function() {
+      landlord.on('ready', function () {
         landlord.subscriber.emit('data', 'z');
       });
       landlord._initMessageBus();
@@ -216,7 +216,7 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_checkJsonRpcRequest', function() {
+  describe('#_checkJsonRpcRequest', function () {
     var landlord = complex.createLandlord({});
     landlord._opts = {
       serverOpts: {
@@ -227,7 +227,7 @@ describe('Landlord', function() {
       }
     };
 
-    it('will return unauthorized error', function() {
+    it('will return unauthorized error', function () {
       var req = {
         authorization: {
           basic: {
@@ -241,7 +241,7 @@ describe('Landlord', function() {
       expect(error.message).to.equal('Not authorized');
     });
 
-    it('will return bad request error', function() {
+    it('will return bad request error', function () {
       var req = {
         authorization: {
           basic: {
@@ -258,7 +258,7 @@ describe('Landlord', function() {
       expect(error.message).to.equal('Bad request');
     });
 
-    it('will return undefined without any errors', function() {
+    it('will return undefined without any errors', function () {
       var req = {
         authorization: {
           basic: {
@@ -277,11 +277,11 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_recordRequestTimeout', function() {
+  describe('#_recordRequestTimeout', function () {
     const sandbox = sinon.sandbox.create();
     afterEach(() => sandbox.restore());
 
-    it('will warn from contact lookup', function() {
+    it('will warn from contact lookup', function () {
       const landlord = complex.createLandlord({
         timeoutRateThreshold: 0.4
       });
@@ -299,7 +299,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('will warn if contact not found', function() {
+    it('will warn if contact not found', function () {
       const landlord = complex.createLandlord({
         timeoutRateThreshold: 0.4
       });
@@ -317,7 +317,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('will warn if unable to save contact', function() {
+    it('will warn if unable to save contact', function () {
       const landlord = complex.createLandlord({
         timeoutRateThreshold: 0.4
       });
@@ -344,7 +344,7 @@ describe('Landlord', function() {
       expect(contact.recordTimeoutFailure.callCount).to.equal(1);
     });
 
-    it('will save contact with updated lastTimeout', function() {
+    it('will save contact with updated lastTimeout', function () {
       const landlord = complex.createLandlord({
         timeoutRateThreshold: 0.4
       });
@@ -370,7 +370,7 @@ describe('Landlord', function() {
       expect(contact.recordTimeoutFailure.callCount).to.equal(1);
     });
 
-    it('will log warning if timeout rate exceeds threshold', function() {
+    it('will log warning if timeout rate exceeds threshold', function () {
       const landlord = complex.createLandlord({
         timeoutRateThreshold: 0.4
       });
@@ -404,8 +404,8 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_setJsonRpcRequestTimeout', function() {
-    it('will log method, id, data_hash and node_id', function(done) {
+  describe('#_setJsonRpcRequestTimeout', function () {
+    it('will log method, id, data_hash and node_id', function (done) {
       var landlord = complex.createLandlord({ requestTimeout: 1 });
       sandbox.stub();
       var send = sinon.stub();
@@ -431,12 +431,12 @@ describe('Landlord', function() {
       };
       landlord._recordRequestTimeout = sinon.stub();
       landlord._setJsonRpcRequestTimeout(req);
-      setTimeout(function() {
+      setTimeout(function () {
         expect(landlord._recordRequestTimeout.callCount).to.equal(1);
         expect(landlord._logger.warn.callCount).to.equal(1);
         expect(landlord._logger.warn.args[0][0])
           .to.equal('job timed out, method: %s, id: %s, ' +
-                    'data_hash: %s, node_id: %s');
+            'data_hash: %s, node_id: %s');
         expect(landlord._logger.warn.args[0][1])
           .to.equal('getRetrievalPointer');
         expect(landlord._logger.warn.args[0][2])
@@ -445,7 +445,7 @@ describe('Landlord', function() {
       }, 2);
     });
 
-    it('will log method, id and data_hash on timeout', function(done) {
+    it('will log method, id and data_hash on timeout', function (done) {
       var landlord = complex.createLandlord({ requestTimeout: 1 });
       sandbox.stub();
       var send = sinon.stub();
@@ -467,11 +467,11 @@ describe('Landlord', function() {
         }
       };
       landlord._setJsonRpcRequestTimeout(req);
-      setTimeout(function() {
+      setTimeout(function () {
         expect(landlord._logger.warn.callCount).to.equal(1);
         expect(landlord._logger.warn.args[0][0])
           .to.equal('job timed out, method: %s, id: %s, ' +
-                    'data_hash: %s, node_id: %s');
+            'data_hash: %s, node_id: %s');
         expect(landlord._logger.warn.args[0][1])
           .to.equal('getStorageOffer');
         expect(landlord._logger.warn.args[0][2])
@@ -480,7 +480,7 @@ describe('Landlord', function() {
       }, 2);
     });
 
-    it('will send error after timeout ', function(done) {
+    it('will send error after timeout ', function (done) {
       var landlord = complex.createLandlord({ requestTimeout: 1 });
       var send = sandbox.stub();
       landlord._pendingJobs.someid = {
@@ -494,13 +494,13 @@ describe('Landlord', function() {
         }
       };
       landlord._setJsonRpcRequestTimeout(req);
-      setTimeout(function() {
+      setTimeout(function () {
         expect(send.callCount).to.equal(1);
         expect(landlord._pendingJobs.someid).to.equal(undefined);
         done();
       }, 2);
     });
-    it('will return if there is a missing pending response', function(done) {
+    it('will return if there is a missing pending response', function (done) {
       var landlord = complex.createLandlord({ requestTimeout: 5 });
       var send = sandbox.stub();
       var req = {
@@ -509,7 +509,7 @@ describe('Landlord', function() {
         }
       };
       landlord._setJsonRpcRequestTimeout(req);
-      setTimeout(function() {
+      setTimeout(function () {
         expect(send.callCount).to.equal(0);
         expect(landlord._pendingJobs.someid).to.equal(undefined);
         done();
@@ -517,8 +517,8 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_handleJsonRpcRequest', function() {
-    it('will send error with invalid json or auth', function() {
+  describe('#_handleJsonRpcRequest', function () {
+    it('will send error with invalid json or auth', function () {
       var landlord = complex.createLandlord({ requestTimout: 1 });
       var req = {
         body: {
@@ -539,7 +539,7 @@ describe('Landlord', function() {
       expect(res.send.args[0][0].message).to.equal('test');
     });
 
-    it('will keep track of the response object and send work', function() {
+    it('will keep track of the response object and send work', function () {
       var landlord = complex.createLandlord({ requestTimout: 1 });
       var req = {
         body: {
@@ -570,65 +570,65 @@ describe('Landlord', function() {
     });
   });
 
-  describe('#_getKeyFromRpcMessage', function() {
+  describe('#_getKeyFromRpcMessage', function () {
 
-    it('getConsignmentPointer should use the nodeID of farmer', function() {
+    it('getConsignmentPointer should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'getConsignmentPointer',
         params: [{ nodeID: 'nodeid' }]
       })).to.equal('nodeid');
     });
 
-    it('getRetrievalPointer should use the nodeID of farmer', function() {
+    it('getRetrievalPointer should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'getRetrievalPointer',
         params: [{ nodeID: 'nodeid' }]
       })).to.equal('nodeid');
     });
 
-    it('renewContract should use the nodeID of farmer', function() {
+    it('renewContract should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'renewContract',
         params: [{ nodeID: 'nodeid' }]
       })).to.equal('nodeid');
     });
 
-    it('publishContract should use the nodeID of farmer', function() {
+    it('publishContract should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'publishContract',
         params: [[{ _id: 'nodeid1' }, { _id: 'nodeid2' }]]
       })).to.equal('nodeid1');
     });
 
-    it('getStorageProof should use the nodeID of farmer', function() {
+    it('getStorageProof should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'getStorageProof',
         params: [{ nodeID: 'nodeid' }]
       })).to.equal('nodeid');
     });
 
-    it('ping should use the nodeID of farmer', function() {
+    it('ping should use the nodeID of farmer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'ping',
         params: [{ nodeID: 'nodeid' }]
       })).to.equal('nodeid');
     });
 
-    it('getStorageOffer should use the data hash of contract', function() {
+    it('getStorageOffer should use the data hash of contract', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'getStorageOffer',
         params: [{ data_hash: 'datahash' }]
       })).to.equal('datahash');
     });
 
-    it('getMirrorNodes should use the hash of pointer', function() {
+    it('getMirrorNodes should use the hash of pointer', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'getMirrorNodes',
         params: [[{ hash: 'datahash' }], [{ nodeID: 'nodeid' }]]
       })).to.equal('nodeid');
     });
 
-    it('should be random', function() {
+    it('should be random', function () {
       expect(Landlord.prototype._getKeyFromRpcMessage({
         method: 'someUnknownMethod',
         params: []
@@ -637,35 +637,35 @@ describe('Landlord', function() {
 
   });
 
-  describe('#_isValidJsonRpcRequest', function() {
+  describe('#_isValidJsonRpcRequest', function () {
     var landlord = complex.createLandlord({});
 
-    it('id should be a string', function() {
+    it('id should be a string', function () {
       var req = { id: 1234 };
       expect(landlord._isValidJsonRpcRequest(req)).to.equal(false);
     });
 
-    it('params should be an array', function() {
+    it('params should be an array', function () {
       var req = { id: 'someid', params: {} };
       expect(landlord._isValidJsonRpcRequest(req)).to.equal(false);
     });
 
-    it('method shoud be a string', function() {
+    it('method shoud be a string', function () {
       var req = { id: 'someid', params: [], method: 847483 };
       expect(landlord._isValidJsonRpcRequest(req)).to.equal(false);
     });
 
-    it('will return true for valid req', function() {
+    it('will return true for valid req', function () {
       var req = { id: 'someid', params: [], method: 'getRetrievalPointer' };
       expect(landlord._isValidJsonRpcRequest(req)).to.equal(true);
     });
   });
 
-  describe('#_recordSuccessTime', function() {
+  describe('#_recordSuccessTime', function () {
     const sandbox = sinon.sandbox.create();
     afterEach(() => sandbox.restore());
 
-    it('it will log if responseTime is not finite', function() {
+    it('it will log if responseTime is not finite', function () {
       const landlord = complex.createLandlord({});
       const job = {
         req: {
@@ -679,7 +679,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('will not log or save for not relevant methods', function() {
+    it('will not log or save for not relevant methods', function () {
       const landlord = complex.createLandlord({});
       const job = {
         req: {
@@ -704,7 +704,7 @@ describe('Landlord', function() {
       expect(findOne.callCount).to.equal(0);
     });
 
-    it('it will log error looking up contact', function() {
+    it('it will log error looking up contact', function () {
       const landlord = complex.createLandlord({});
       const job = {
         req: {
@@ -732,7 +732,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('it will log error with unknown contact', function() {
+    it('it will log error with unknown contact', function () {
       const landlord = complex.createLandlord({});
       const job = {
         req: {
@@ -760,7 +760,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('it will log error saving contact', function() {
+    it('it will log error saving contact', function () {
       const landlord = complex.createLandlord({});
       const job = {
         req: {
@@ -794,7 +794,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('will record response time and save', function() {
+    it('will record response time and save', function () {
       const now = 1481927872255;
       const clock = sandbox.useFakeTimers(now);
       const landlord = complex.createLandlord({});
@@ -838,13 +838,11 @@ describe('Landlord', function() {
 
   });
 
-  describe('#_handleWorkResult', function() {
+  describe('#_handleWorkResult', function () {
     var landlord = complex.createLandlord({});
 
-    it.skip('will warn if job completed late', function() {
-      var buffer = Buffer.from(JSON.stringify({
-        hello: 'world'
-      }));
+    it.skip('will warn if job completed late', function () {
+      var buffer = Buffer.from(JSON.stringify({ hello: 'world' }));
       landlord._logger = {
         warn: sandbox.stub()
       };
@@ -852,7 +850,7 @@ describe('Landlord', function() {
       expect(landlord._logger.warn.callCount).to.equal(1);
     });
 
-    it('will send error if data has error', function() {
+    it('will send error if data has error', function () {
       var buffer = Buffer.from(JSON.stringify({
         hello: 'world',
         id: 'someid',
@@ -878,7 +876,7 @@ describe('Landlord', function() {
       expect(send.args[0][0].message).to.equal('rabbits are afk');
     });
 
-    it('will send completed work and delete callback', function() {
+    it('will send completed work and delete callback', function () {
       const buffer = Buffer.from(JSON.stringify({
         hello: 'world',
         id: 'someid',

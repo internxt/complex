@@ -16,7 +16,7 @@ var HDKey = require('hdkey');
 var complex = require('..');
 
 var seed = 'a0c42a9c3ac6abf2ba6a9946ae83af18f51bf1c9fa7dacc4c92513cc4dd015834' +
-    '341c775dcd4c0fac73547c5662d81a9e9361a0aac604a73a321bd9103bce8af';
+  '341c775dcd4c0fac73547c5662d81a9e9361a0aac604a73a321bd9103bce8af';
 var key = '08d1015861dd2c09ab36e97a8ecdbae26f20baabede6d618f6fb62904522c7fa';
 var migrationKeyPair = storj.KeyPair(key);
 var migID = migrationKeyPair.getNodeID();
@@ -25,19 +25,19 @@ var hdKey = masterKey.derive('m/3000\'/0\'');
 var child = hdKey.deriveChild(10);
 var childPriv = child.privateKey.toString('hex');
 var pub = 'xpub6BHSRpUigNcUpUAWvcJJrCVnPUvbi8ZUzeRfsipe9ow21YE7eoLhzJ4h' +
-    'vkQmEoGMeX3jpwaHp91ycGo1Z4WStsEVBmw1qq6Q3ouPm6GqA4L';
+  'vkQmEoGMeX3jpwaHp91ycGo1Z4WStsEVBmw1qq6Q3ouPm6GqA4L';
 var priv = '979008b562424a0bcd29d82ca6c5c27c7b8e420e17a936752454b9650fac3cd5';
 var nodeID = '4abb9b37bd4cbea611c480eb967ad96bf2e3b850';
 
-describe('Renter', function() {
+describe('Renter', function () {
 
-  describe('@constructor', function() {
+  describe('@constructor', function () {
     var sandbox = sinon.sandbox.create();
-    afterEach(function() {
+    afterEach(function () {
       sandbox.restore();
     });
 
-    it('will construct new instance (with/without new)', function() {
+    it('will construct new instance (with/without new)', function () {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -49,7 +49,7 @@ describe('Renter', function() {
       expect(renter2).to.be.instanceOf(complex.createRenter);
     });
 
-    it('will contruct with a config object', function() {
+    it('will contruct with a config object', function () {
       var config = {
         type: 'Renter',
         opts: {
@@ -87,7 +87,7 @@ describe('Renter', function() {
       expect(renter.keyPair.getPrivateKey()).to.equal(childPriv);
     });
 
-    it('will construct with hd private key', function() {
+    it('will construct with hd private key', function () {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10
@@ -101,8 +101,8 @@ describe('Renter', function() {
 
   });
 
-  describe('#_initStorage', function() {
-    it('will instantiate storage', function() {
+  describe('#_initStorage', function () {
+    it('will instantiate storage', function () {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -128,12 +128,12 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_initNetwork', function() {
+  describe('#_initNetwork', function () {
     var sandbox = sinon.sandbox.create();
-    afterEach(function() {
+    afterEach(function () {
       sandbox.restore();
     });
-    it('will initialize network', function(done) {
+    it('will initialize network', function (done) {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -150,11 +150,11 @@ describe('Renter', function() {
           maxConnections: 10
         },
       };
-      var StorageManager = function() {};
+      var StorageManager = function () { };
       util.inherits(StorageManager, storj.StorageManager);
       sandbox.stub(storj, 'StorageManager', StorageManager);
       var Renter = proxyquire('../lib/renter', {
-        'storj-mongodb-adapter': function() {}
+        'storj-mongodb-adapter': function () { }
       });
       var renter = new Renter(options);
       var seeds = [
@@ -185,59 +185,59 @@ describe('Renter', function() {
     });
   });
 
-  describe('#start', function() {
+  describe('#start', function () {
     var sandbox = sinon.sandbox.create();
-    afterEach(function() {
+    afterEach(function () {
       sandbox.restore();
     });
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
-    it('it will handle error seeds query', function(done) {
+    it('it will handle error seeds query', function (done) {
       var renter = complex.createRenter(options);
       renter._initStorage = sinon.stub();
       renter._loadKnownSeeds = sinon.stub().callsArgWith(0, new Error('test'));
-      renter.start(function(err) {
+      renter.start(function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
         done();
       });
     });
-    it('it will init message bus', function(done) {
+    it('it will init message bus', function (done) {
       var renter = complex.createRenter(options);
       renter._initStorage = sinon.stub();
       renter._initNetwork = sinon.stub();
       var amqpContext = new EventEmitter();
       sandbox.stub(rabbitmq, 'createContext').returns(amqpContext);
-      sandbox.stub(Renter.prototype, '_initMessageBus', function() {
+      sandbox.stub(Renter.prototype, '_initMessageBus', function () {
         this.emit('ready');
       });
       var seeds = [
         'storj://127.0.0.1:3000/955af05f3130ac5c70952a34a9aa710c9fbf812b'
       ];
       renter._loadKnownSeeds = sinon.stub().callsArgWith(0, null, seeds);
-      renter.start(function(err) {
+      renter.start(function (err) {
         expect(renter._initMessageBus.callCount).to.equal(1);
         expect(err).to.be.equal(undefined);
         done();
       });
       amqpContext.emit('ready');
     });
-    it('will callback with error from emit', function(done) {
+    it('will callback with error from emit', function (done) {
       var renter = complex.createRenter(options);
       renter._initStorage = sinon.stub();
       renter._initNetwork = sinon.stub();
       var amqpContext = new EventEmitter();
       sandbox.stub(rabbitmq, 'createContext').returns(amqpContext);
-      sandbox.stub(Renter.prototype, '_initMessageBus', function() {
+      sandbox.stub(Renter.prototype, '_initMessageBus', function () {
         this.emit('ready');
       });
       var seeds = [
         'storj://127.0.0.1:3000/955af05f3130ac5c70952a34a9aa710c9fbf812b'
       ];
       renter._loadKnownSeeds = sinon.stub().callsArgWith(0, null, seeds);
-      renter.start(function(err) {
+      renter.start(function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
         done();
@@ -246,12 +246,12 @@ describe('Renter', function() {
     });
   });
 
-  describe('_loadKnownSeeds', function() {
+  describe('_loadKnownSeeds', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
-    it('will load latest contacts by url', function() {
+    it('will load latest contacts by url', function () {
       var renter = complex.createRenter(options);
       var contacts = [
         new storj.Contact({
@@ -276,14 +276,14 @@ describe('Renter', function() {
           }
         }
       };
-      renter._loadKnownSeeds(function(err, contacts) {
+      renter._loadKnownSeeds(function (err, contacts) {
         expect(err).to.equal(null);
         expect(contacts).to.deep.equal([
           'storj://127.0.0.1:3000/955af05f3130ac5c70952a34a9aa710c9fbf812b'
         ]);
       });
     });
-    it('will handle error from storage', function() {
+    it('will handle error from storage', function () {
       var renter = complex.createRenter(options);
       var exec = sinon.stub().callsArgWith(0, new Error('test'));
       var limit = sinon.stub().returns({
@@ -302,115 +302,115 @@ describe('Renter', function() {
           }
         }
       };
-      renter._loadKnownSeeds(function(err) {
+      renter._loadKnownSeeds(function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
       });
     });
   });
 
-  describe('_getQueueSpan', function() {
+  describe('_getQueueSpan', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
-    it('0 renter', function() {
+    it('0 renter', function () {
       var renter = complex.createRenter(options);
-      expect(function() {
+      expect(function () {
         renter._getQueueSpan(256, 0, 0.999);
       }).to.throw('y is expected');
     });
-    it('Infinity renter', function() {
+    it('Infinity renter', function () {
       var renter = complex.createRenter(options);
-      expect(function() {
+      expect(function () {
         renter._getQueueSpan(256, Infinity, 0.999);
       }).to.throw('y is expected');
     });
-    it('NaN renter', function() {
+    it('NaN renter', function () {
       var renter = complex.createRenter(options);
-      expect(function() {
+      expect(function () {
         renter._getQueueSpan(256, NaN, 0.999);
       }).to.throw('y is expected');
     });
-    it('1 renter', function() {
+    it('1 renter', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 1, 0.999);
       expect(Math.ceil(span)).to.equal(256);
     });
-    it('2 renters', function() {
+    it('2 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 2, 0.999);
       expect(Math.ceil(span)).to.equal(248);
     });
-    it('3 renters', function() {
+    it('3 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 3, 0.999);
       expect(Math.ceil(span)).to.equal(231);
     });
-    it('4 renters', function() {
+    it('4 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 4, 0.999);
       expect(Math.ceil(span)).to.equal(211);
     });
-    it('32 renters', function() {
+    it('32 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 32, 0.999);
       expect(Math.ceil(span)).to.equal(50);
     });
-    it('64 renters', function() {
+    it('64 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 64, 0.999);
       expect(Math.ceil(span)).to.equal(27);
     });
-    it('96 renters', function() {
+    it('96 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 96, 0.999);
       expect(Math.ceil(span)).to.equal(18);
     });
-    it('128 renters', function() {
+    it('128 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 128, 0.999);
       expect(Math.ceil(span)).to.equal(14);
     });
-    it('160 renters', function() {
+    it('160 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 160, 0.999);
       expect(Math.ceil(span)).to.equal(11);
     });
-    it('192 renters', function() {
+    it('192 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 192, 0.999);
       expect(Math.ceil(span)).to.equal(10);
     });
-    it('224 renters', function() {
+    it('224 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 224, 0.999);
       expect(Math.ceil(span)).to.equal(8);
     });
-    it('256 renters', function() {
+    it('256 renters', function () {
       var renter = complex.createRenter(options);
       var span = renter._getQueueSpan(256, 256, 0.999);
       expect(Math.ceil(span)).to.equal(7);
     });
   });
 
-  describe('_getQueueOffset', function() {
+  describe('_getQueueOffset', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10,
       totalRenters: 160,
       renterOverlap: 3
     };
-    it('should multiply span by overlap and give half the result', function() {
+    it('should multiply span by overlap and give half the result', function () {
       var renter = complex.createRenter(options);
       var offset = renter._getQueueOffset();
       expect(offset).to.equal(17);
     });
   });
 
-  describe('_initMessageBus', function() {
+  describe('_initMessageBus', function () {
     var sandbox = sinon.sandbox.create();
-    afterEach(function() {
+    afterEach(function () {
       sandbox.restore();
     });
     var options = {
@@ -419,7 +419,7 @@ describe('Renter', function() {
       totalRenters: 256,
       renterOverlap: 1
     };
-    it('setup sockets, connect, join network and handle work', function() {
+    it('setup sockets, connect, join network and handle work', function () {
       sandbox.stub(Renter.prototype, '_handleWork');
       var renter = complex.createRenter(options);
       renter._handleNetworkEvents = sinon.stub();
@@ -440,12 +440,12 @@ describe('Renter', function() {
         new EventEmitter(),
         new EventEmitter()
       ];
-      workSockets.forEach(function(s) {
+      workSockets.forEach(function (s) {
         s.connect = sinon.stub();
       });
       renter._amqpContext = {
-        socket: function(method) {
-          switch(method) {
+        socket: function (method) {
+          switch (method) {
             case 'PUBLISH':
               return pubSocket;
             case 'WORKER':
@@ -475,7 +475,7 @@ describe('Renter', function() {
       expect(Renter.prototype._handleWork.args[0][1]).to.equal(data);
       expect(renter._handleNetworkEvents.callCount).to.equal(1);
     });
-    it('will emit error from network join', function(done) {
+    it('will emit error from network join', function (done) {
       sandbox.stub(Renter.prototype, '_handleWork');
       var renter = complex.createRenter(options);
       renter._handleNetworkEvents = sinon.stub();
@@ -488,8 +488,8 @@ describe('Renter', function() {
       var workSocket = new EventEmitter();
       workSocket.connect = sinon.stub();
       renter._amqpContext = {
-        socket: function(method) {
-          switch(method) {
+        socket: function (method) {
+          switch (method) {
             case 'PUBLISH':
               return pubSocket;
             case 'WORKER':
@@ -497,7 +497,7 @@ describe('Renter', function() {
           }
         }
       };
-      renter.on('error', function(err) {
+      renter.on('error', function (err) {
         expect(err.message).to.equal('test');
         done();
       });
@@ -505,12 +505,12 @@ describe('Renter', function() {
     });
   });
 
-  describe('_onContactAdded', function() {
+  describe('_onContactAdded', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
-    it('will record contact', function() {
+    it('will record contact', function () {
       var renter = complex.createRenter(options);
       var contact = storj.Contact({
         address: '127.0.0.1',
@@ -529,9 +529,9 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_handleNetworkEvents', function() {
+  describe('#_handleNetworkEvents', function () {
     var sandbox = sinon.sandbox.create();
-    afterEach(function() {
+    afterEach(function () {
       sandbox.restore();
     });
     var options = {
@@ -539,7 +539,7 @@ describe('Renter', function() {
       networkIndex: 10
     };
 
-    it('will add contact with router add and shift', function(done) {
+    it('will add contact with router add and shift', function (done) {
       var renter = complex.createRenter(options);
       sandbox.stub(Renter.prototype, '_onContactAdded');
       var router = new EventEmitter();
@@ -547,7 +547,7 @@ describe('Renter', function() {
         router: router
       };
       sinon.spy(renter.network.router, 'on');
-      renter.on('ready', function() {
+      renter.on('ready', function () {
         expect(router.on.callCount).to.equal(2);
         var data = {};
         router.emit('add', data);
@@ -560,13 +560,13 @@ describe('Renter', function() {
 
   });
 
-  describe('#_handleWork', function() {
+  describe('#_handleWork', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
 
-    it('will give method not found message', function() {
+    it('will give method not found message', function () {
       var renter = complex.createRenter(options);
       renter.workers = {
         test: { ack: sinon.stub() }
@@ -591,7 +591,7 @@ describe('Renter', function() {
       expect(renter.workers.test.ack.callCount).to.equal(1);
     });
 
-    it('will handle ping command', function() {
+    it('will handle ping command', function () {
       var renter = complex.createRenter(options);
       renter.workers = {
         test: { ack: sinon.stub() }
@@ -621,7 +621,7 @@ describe('Renter', function() {
       expect(renter.workers.test.ack.callCount).to.equal(1);
     });
 
-    it('will serialize/deserialize args with redirected method', function() {
+    it('will serialize/deserialize args with redirected method', function () {
       var renter = complex.createRenter(options);
       var pointer = {
         farmer: storj.Contact({
@@ -681,7 +681,7 @@ describe('Renter', function() {
       expect(renter.workers.test.ack.callCount).to.equal(1);
     });
 
-    it('will serialize/deserialize args for non-redirect', function() {
+    it('will serialize/deserialize args for non-redirect', function () {
       var proof = [
         [
           [
@@ -716,19 +716,19 @@ describe('Renter', function() {
       var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
-        params: [ farmer, item ]
+        params: [farmer, item]
       }));
       renter._handleWork(renter.workers.test, buffer);
       expect(write.callCount).to.equal(1);
       var parsed = JSON.parse(write.args[0][0].toString());
       expect(parsed).to.deep.equal({
         id: 'someid',
-        result: [ null, proof ]
+        result: [null, proof]
       });
       expect(renter.workers.test.ack.callCount).to.equal(1);
     });
 
-    it('will give error from calling method', function() {
+    it('will give error from calling method', function () {
       var renter = complex.createRenter(options);
       renter.workers = {
         test: { ack: sinon.stub() }
@@ -748,7 +748,7 @@ describe('Renter', function() {
       var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
-        params: [ farmer, item ]
+        params: [farmer, item]
       }));
       renter._handleWork(renter.workers.test, buffer);
       expect(write.callCount).to.equal(1);
@@ -763,7 +763,7 @@ describe('Renter', function() {
       expect(renter.workers.test.ack.callCount).to.equal(1);
     });
 
-    it('will give error if calling method', function() {
+    it('will give error if calling method', function () {
       var renter = complex.createRenter(options);
       renter.workers = {
         test: { ack: sinon.stub() }
@@ -783,7 +783,7 @@ describe('Renter', function() {
       var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
-        params: [ farmer, item ]
+        params: [farmer, item]
       }));
       renter._handleWork(renter.workers.test, buffer);
       expect(write.callCount).to.equal(1);
@@ -800,21 +800,21 @@ describe('Renter', function() {
 
   });
 
-  describe('#_deserializeArguments', function() {
+  describe('#_deserializeArguments', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
     var renter = complex.createRenter(options);
 
-    it('unknown', function() {
+    it('unknown', function () {
       var method = 'someUnknownMethod';
       var args = [];
       var result = renter._deserializeArguments(method, args);
       expect(result).to.equal(args);
     });
 
-    it('getConsignmentPointer', function() {
+    it('getConsignmentPointer', function () {
       var method = 'getConsignmentPointer';
       var tree = [
         '45bd496c4f4c1235270c6b2e1f60b051a3a609bf',
@@ -867,7 +867,7 @@ describe('Renter', function() {
       expect(result[2]).to.be.instanceOf(storj.AuditStream);
     });
 
-    it('getRetrievalPointer', function() {
+    it('getRetrievalPointer', function () {
       var method = 'getRetrievalPointer';
       var args = [
         {
@@ -883,7 +883,7 @@ describe('Renter', function() {
       expect(result[1]).to.be.instanceOf(storj.Contract);
     });
 
-    it('getMirrorNodes', function() {
+    it('getMirrorNodes', function () {
       var method = 'getMirrorNodes';
       var args = [
         [
@@ -918,12 +918,12 @@ describe('Renter', function() {
         ]
       ];
       var result = renter._deserializeArguments(method, args);
-      result[1].forEach(function(data) {
+      result[1].forEach(function (data) {
         expect(data).to.be.instanceOf(storj.Contact);
       });
     });
 
-    it('getStorageProof', function() {
+    it('getStorageProof', function () {
       var method = 'getStorageProof';
       var args = [
         {
@@ -963,7 +963,7 @@ describe('Renter', function() {
       expect(result[1]).to.be.instanceOf(storj.StorageItem);
     });
 
-    it('getStorageOffer (with blacklist)', function() {
+    it('getStorageOffer (with blacklist)', function () {
       var method = 'getStorageOffer';
       var args = [
         {
@@ -980,13 +980,13 @@ describe('Renter', function() {
       expect(result[1]).to.equal(args[1]);
     });
 
-    it('getStorageOffer (without blacklist)', function() {
+    it('getStorageOffer (without blacklist)', function () {
       var method = 'getStorageOffer';
       var args = [
         {
           data_hash: '2418003db2a20ea6b99d8efaa61aecb5acbb96a9'
         },
-        function() {}
+        function () { }
       ];
       var result = renter._deserializeArguments(method, args);
       expect(result[0]).to.be.instanceOf(storj.Contract);
@@ -996,7 +996,7 @@ describe('Renter', function() {
 
   });
 
-  describe('#_serializeArguments', function() {
+  describe('#_serializeArguments', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
@@ -1011,15 +1011,15 @@ describe('Renter', function() {
       'etcetera'
     ];
 
-    unchanged.forEach(function(method) {
-      it('unchanged: ' + method, function() {
+    unchanged.forEach(function (method) {
+      it('unchanged: ' + method, function () {
         var args = [];
         var result = renter._serializeArguments(method, args);
         expect(result).to.equal(args);
       });
     });
 
-    it('getStorageOffer', function() {
+    it('getStorageOffer', function () {
       var method = 'getStorageOffer';
       var contact = new storj.Contact({
         address: '127.0.0.1',
@@ -1038,9 +1038,9 @@ describe('Renter', function() {
 
   });
 
-  describe('#_signStorageContract', function() {
+  describe('#_signStorageContract', function () {
 
-    it('will set the hd props on the contract', function() {
+    it('will set the hd props on the contract', function () {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10
@@ -1065,8 +1065,8 @@ describe('Renter', function() {
 
   });
 
-  describe('#_getRetrievalPointer', function() {
-    it('will handle error from renew contract', function(done) {
+  describe('#_getRetrievalPointer', function () {
+    it('will handle error from renew contract', function (done) {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -1078,13 +1078,13 @@ describe('Renter', function() {
         get: sinon.stub().returns(undefined)
       };
       renter._renewContract = sinon.stub().callsArgWith(2, new Error('test'));
-      renter._getRetrievalPointer(contact, contract, function(err) {
+      renter._getRetrievalPointer(contact, contract, function (err) {
         expect(err).to.be.instanceOf(Error);
         done();
       });
     });
 
-    it('will not renew without migration key', function(done) {
+    it('will not renew without migration key', function (done) {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10
@@ -1096,7 +1096,7 @@ describe('Renter', function() {
       };
       var contract = {};
       var contact = {};
-      renter._getRetrievalPointer(contact, contract, function() {
+      renter._getRetrievalPointer(contact, contract, function () {
         expect(renter.network.getRetrievalPointer.callCount)
           .to.equal(1);
         expect(renter.network.getRetrievalPointer.args[0][0])
@@ -1108,7 +1108,7 @@ describe('Renter', function() {
       });
     });
 
-    it('will not renew if contract already has hd key', function(done) {
+    it('will not renew if contract already has hd key', function (done) {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -1122,7 +1122,7 @@ describe('Renter', function() {
       var contract = new storj.Contract();
       contract.set('renter_hd_key', hdKey.publicExtendedKey);
       var contact = {};
-      renter._getRetrievalPointer(contact, contract, function() {
+      renter._getRetrievalPointer(contact, contract, function () {
         expect(renter.network.getRetrievalPointer.callCount)
           .to.equal(1);
         expect(renter.network.getRetrievalPointer.args[0][0])
@@ -1134,7 +1134,7 @@ describe('Renter', function() {
       });
     });
 
-    it('will renew and get pointer', function(done) {
+    it('will renew and get pointer', function (done) {
       var options = {
         networkPrivateExtendedKey: hdKey.privateExtendedKey,
         networkIndex: 10,
@@ -1147,7 +1147,7 @@ describe('Renter', function() {
       };
       var contract = new storj.Contract();
       var contact = {};
-      renter._getRetrievalPointer(contact, contract, function() {
+      renter._getRetrievalPointer(contact, contract, function () {
         expect(renter.network.getRetrievalPointer.callCount)
           .to.equal(1);
         expect(renter.network.getRetrievalPointer.args[0][0])
@@ -1160,13 +1160,13 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_renewContract', function() {
+  describe('#_renewContract', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10,
       migrationPrivateKey: key
     };
-    it('will handle error from transport', function(done) {
+    it('will handle error from transport', function (done) {
       var renter = complex.createRenter(options);
       var contact = {};
       var contract = {
@@ -1179,13 +1179,13 @@ describe('Renter', function() {
           send: sinon.stub().callsArgWith(2, new Error('test'))
         }
       };
-      renter._renewContract(contact, contract, function(err) {
+      renter._renewContract(contact, contract, function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
         done();
       });
     });
-    it('will handle error from farmer', function(done) {
+    it('will handle error from farmer', function (done) {
       var renter = complex.createRenter(options);
       var contact = {};
       var contract = {
@@ -1202,13 +1202,13 @@ describe('Renter', function() {
           })
         }
       };
-      renter._renewContract(contact, contract, function(err) {
+      renter._renewContract(contact, contract, function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
         done();
       });
     });
-    it('will handle invalid contract from farmer', function(done) {
+    it('will handle invalid contract from farmer', function (done) {
       var renter = complex.createRenter(options);
       var contact = {};
       var contract = {
@@ -1226,13 +1226,13 @@ describe('Renter', function() {
           })
         }
       };
-      renter._renewContract(contact, contract, function(err) {
+      renter._renewContract(contact, contract, function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('Invalid farmer contract');
         done();
       });
     });
-    it('will save valid renewed contract', function(done) {
+    it('will save valid renewed contract', function (done) {
       var renter = complex.createRenter(options);
       var contact = {};
       var contract = {
@@ -1251,20 +1251,20 @@ describe('Renter', function() {
           })
         }
       };
-      renter._renewContract(contact, contract, function(err) {
+      renter._renewContract(contact, contract, function (err) {
         expect(err).to.equal(undefined);
         done();
       });
     });
   });
 
-  describe('#_renewContractMessage', function() {
+  describe('#_renewContractMessage', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10,
       migrationPrivateKey: key
     };
-    it('will create renew message', function() {
+    it('will create renew message', function () {
       var renter = complex.createRenter(options);
       var contact = new storj.Contact({
         address: '127.0.0.1',
@@ -1290,13 +1290,13 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_validRenewedContract', function() {
+  describe('#_validRenewedContract', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10,
       migrationPrivateKey: key
     };
-    it('return false if contracts are different except for sig', function() {
+    it('return false if contracts are different except for sig', function () {
       var renter = complex.createRenter(options);
       var before = new storj.Contract();
       var id = '028fa8eeb6f3c3d9c0746da43164834e7df08bc6';
@@ -1306,7 +1306,7 @@ describe('Renter', function() {
       after.set('farmed_id', id2);
       expect(renter._validRenewedContract(before, after)).to.equal(false);
     });
-    it('return false with bad signature', function() {
+    it('return false with bad signature', function () {
       var renter = complex.createRenter(options);
       var before = new storj.Contract();
       var key = new storj.KeyPair();
@@ -1316,7 +1316,7 @@ describe('Renter', function() {
       after.sign('farmer', key2.getPrivateKey());
       expect(renter._validRenewedContract(before, after)).to.equal(false);
     });
-    it('return true with good signature', function() {
+    it('return true with good signature', function () {
       var renter = complex.createRenter(options);
       var before = new storj.Contract();
       var key = new storj.KeyPair();
@@ -1327,13 +1327,13 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_saveRenewedContract', function() {
+  describe('#_saveRenewedContract', function () {
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10,
       migrationPrivateKey: key
     };
-    it('will handle error from storage manager', function() {
+    it('will handle error from storage manager', function () {
       var renter = complex.createRenter(options);
       var contract = new storj.Contract();
       renter.network = {
@@ -1341,12 +1341,12 @@ describe('Renter', function() {
           load: sinon.stub().callsArgWith(1, new Error('test'))
         }
       };
-      renter._saveRenewedContract(contract, function(err) {
+      renter._saveRenewedContract(contract, function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
       });
     });
-    it('will save updated storage item', function() {
+    it('will save updated storage item', function () {
       var renter = complex.createRenter(options);
       var contract = new storj.Contract();
       contract.set('farmer_id', '0d172aae0b9468103401c88d2491415a659a0f9c');
@@ -1360,7 +1360,7 @@ describe('Renter', function() {
           save: sinon.stub().callsArg(1)
         }
       };
-      renter._saveRenewedContract(contract, function(err) {
+      renter._saveRenewedContract(contract, function (err) {
         expect(err).to.equal(undefined);
         expect(item.removeContract.callCount).to.equal(1);
         expect(item.removeContract.args[0][0]).to.deep.equal({
@@ -1375,14 +1375,14 @@ describe('Renter', function() {
     });
   });
 
-  describe('#_getStorageOffers', function() {
+  describe('#_getStorageOffers', function () {
     var sandbox = sinon.sandbox.create();
     var options = {
       networkPrivateExtendedKey: hdKey.privateExtendedKey,
       networkIndex: 10
     };
 
-    it('will handle error from stream', function(done) {
+    it('will handle error from stream', function (done) {
       var renter = complex.createRenter(options);
       renter._logger = {
         error: sinon.stub()
@@ -1402,10 +1402,11 @@ describe('Renter', function() {
       done();
     });
 
-    it('will handle offer stream end', function(done) {
+    it('will handle offer stream end', function (done) {
       var renter = complex.createRenter(options);
       renter._logger = {
-        info: sinon.stub()
+        info: sinon.stub(),
+        error: sinon.stub()
       };
       var contract = {
         get: sinon.stub()
@@ -1422,10 +1423,11 @@ describe('Renter', function() {
       done();
     });
 
-    it('will handle first data event from stream', function(done) {
+    it('will handle first data event from stream', function (done) {
       var renter = complex.createRenter(options);
       renter._logger = {
-        info: sinon.stub()
+        info: sinon.stub(),
+        error: sinon.stub()
       };
       var contact = {};
       var contract = {
@@ -1444,9 +1446,9 @@ describe('Renter', function() {
         }
       };
       renter._signStorageContract = sinon.stub();
-      renter._getStorageOffers(contract, blacklist, function(err,
-                                                             contact2,
-                                                             contract2) {
+      renter._getStorageOffers(contract, blacklist, function (err,
+        contact2,
+        contract2) {
         expect(contact2).to.equal(contact);
         expect(contract2).to.equal(contract);
         done();
@@ -1458,10 +1460,11 @@ describe('Renter', function() {
       offerStream.emit('data', offer);
     });
 
-    it('will handle error from storage load', function(done) {
+    it('will handle error from storage load', function (done) {
       var renter = complex.createRenter(options);
       renter._logger = {
-        info: sinon.stub()
+        info: sinon.stub(),
+        error: sinon.stub()
       };
       var contact = {};
       var contract = {
@@ -1481,9 +1484,9 @@ describe('Renter', function() {
         }
       };
       renter._signStorageContract = sinon.stub();
-      renter._getStorageOffers(contract, blacklist, function(err,
-                                                             contact2,
-                                                             contract2) {
+      renter._getStorageOffers(contract, blacklist, function (err,
+        contact2,
+        contract2) {
         expect(contact2).to.equal(contact);
         expect(contract2).to.equal(contract);
         done();
@@ -1495,10 +1498,11 @@ describe('Renter', function() {
       offerStream.emit('data', offer);
     });
 
-    it('will handle error from storage save', function(done) {
+    it('will handle error from storage save', function (done) {
       var renter = complex.createRenter(options);
       renter._logger = {
-        info: sinon.stub()
+        info: sinon.stub(),
+        error: sinon.stub()
       };
       var contact = {};
       var contract = {
@@ -1517,7 +1521,7 @@ describe('Renter', function() {
         }
       };
       renter._signStorageContract = sinon.stub();
-      renter._getStorageOffers(contract, blacklist, function(err) {
+      renter._getStorageOffers(contract, blacklist, function (err) {
         expect(err).to.be.instanceOf(Error);
         expect(err.message).to.equal('test');
         done();
@@ -1529,11 +1533,12 @@ describe('Renter', function() {
       offerStream.emit('data', offer);
     });
 
-    it('should save additional data as mirror offers', function(done) {
+    it('should save additional data as mirror offers', function (done) {
       /* jshint maxstatements: 50 */
       var renter = complex.createRenter(options);
       renter._logger = {
-        info: sinon.stub()
+        info: sinon.stub(),
+        error: sinon.stub()
       };
       var contact = {};
       var contract = {
@@ -1563,7 +1568,7 @@ describe('Renter', function() {
       renter._getStorageOffers(
         contract,
         blacklist,
-        function(err, contact2, contract2) {
+        function (err, contact2, contract2) {
           expect(contact2).to.equal(contact);
           expect(contract2).to.equal(contract);
         }
@@ -1609,12 +1614,13 @@ describe('Renter', function() {
       done();
     });
 
-    it('will handle error from storing mirrors', function(done) {
+    it('will handle error from storing mirrors', function (done) {
       /* jshint maxstatements: 50 */
       var renter = complex.createRenter(options);
       renter._logger = {
         info: sinon.stub(),
-        warn: sinon.stub()
+        warn: sinon.stub(),
+        error: sinon.stub()
       };
       var contact = {};
       var contract = {
@@ -1644,7 +1650,7 @@ describe('Renter', function() {
       renter._getStorageOffers(
         contract,
         blacklist,
-        function(err, contact2, contract2) {
+        function (err, contact2, contract2) {
           expect(contact2).to.equal(contact);
           expect(contract2).to.equal(contract);
         }
