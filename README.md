@@ -9,9 +9,14 @@ capabilities! [Complete documentation can be found here](https://storj.github.io
 Prerequisites
 -------------
 
-* [Storj Core](https://github.com/storj/core)
+* Python
+* Build essential
 * [MongoDB](https://www.mongodb.com/)
 * [RabbitMQ](https://www.rabbitmq.com)
+
+```
+sudo apt install python build-essential mongodb rabbitmq-server
+```
 
 Installation
 ------------
@@ -19,14 +24,23 @@ Installation
 ### Command Line Interface
 
 ```
-npm install -g storj-complex
+npm install -g internxt/complex
 ```
 
 ### Programmatic
 
 ```
-npm install storj-complex --save
+npm install internxt/complex --save
 ```
+
+### From Git
+
+```
+git clone https://github.com/internxt/complex
+cd complex
+npm install && npm link
+```
+
 
 Usage
 -----
