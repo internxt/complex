@@ -41,7 +41,7 @@
     "request": "^2.75.0",
     "restify": "^4.1.1",
     "secp256k1": "^3.2.2",
-    "storj-lib": "github:internxt/core#v8.7.2",
+    "storj-lib": "github:internxt/core#v8.7.3-beta",
     "storj-mongodb-adapter": "github:internxt/mongodb-adapter#v9.0.1-beta",
     "storj-service-storage-models": "github:internxt/service-storage-models#10.6.1-beta",
     "uuid": "^3.0.0"
