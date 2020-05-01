@@ -563,7 +563,7 @@ describe('Landlord', function() {
       expect(landlord._checkJsonRpcRequest.callCount).to.equal(1);
       expect(landlord._setJsonRpcRequestTimeout.callCount).to.equal(1);
       expect(landlord._workerSockets['work-x-4b'].write.callCount).to.equal(1);
-      var expected = new Buffer(JSON.stringify(req.body));
+      var expected = Buffer.from(JSON.stringify(req.body));
       expect(
         landlord._workerSockets['work-x-4b'].write.args[0][0]
       ).to.deep.equal(expected);
@@ -842,7 +842,7 @@ describe('Landlord', function() {
     var landlord = complex.createLandlord({});
 
     it.skip('will warn if job completed late', function() {
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         hello: 'world'
       }));
       landlord._logger = {
@@ -853,7 +853,7 @@ describe('Landlord', function() {
     });
 
     it('will send error if data has error', function() {
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         hello: 'world',
         id: 'someid',
         error: {
@@ -879,7 +879,7 @@ describe('Landlord', function() {
     });
 
     it('will send completed work and delete callback', function() {
-      const buffer = new Buffer(JSON.stringify({
+      const buffer = Buffer.from(JSON.stringify({
         hello: 'world',
         id: 'someid',
         result: [

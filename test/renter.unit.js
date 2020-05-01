@@ -20,7 +20,7 @@ var seed = 'a0c42a9c3ac6abf2ba6a9946ae83af18f51bf1c9fa7dacc4c92513cc4dd015834' +
 var key = '08d1015861dd2c09ab36e97a8ecdbae26f20baabede6d618f6fb62904522c7fa';
 var migrationKeyPair = storj.KeyPair(key);
 var migID = migrationKeyPair.getNodeID();
-var masterKey = HDKey.fromMasterSeed(new Buffer(seed, 'hex'));
+var masterKey = HDKey.fromMasterSeed(Buffer.from(seed, 'hex'));
 var hdKey = masterKey.derive('m/3000\'/0\'');
 var child = hdKey.deriveChild(10);
 var childPriv = child.privateKey.toString('hex');
@@ -575,7 +575,7 @@ describe('Renter', function() {
       renter.notifier = {
         write: write
       };
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'someUnknownMethod',
         id: 'someid'
       }));
@@ -601,7 +601,7 @@ describe('Renter', function() {
         write: write
       };
       var contact = {};
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'ping',
         id: 'someid',
         params: [contact]
@@ -640,7 +640,7 @@ describe('Renter', function() {
       renter.notifier = {
         write: write
       };
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'getRetrievalPointer',
         id: 'someid',
         params: [
@@ -713,7 +713,7 @@ describe('Renter', function() {
         port: 3000
       };
       var item = {};
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
         params: [ farmer, item ]
@@ -745,7 +745,7 @@ describe('Renter', function() {
         port: 3000
       };
       var item = {};
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
         params: [ farmer, item ]
@@ -780,7 +780,7 @@ describe('Renter', function() {
         port: 3000
       };
       var item = {};
-      var buffer = new Buffer(JSON.stringify({
+      var buffer = Buffer.from(JSON.stringify({
         method: 'getStorageProof',
         id: 'someid',
         params: [ farmer, item ]
